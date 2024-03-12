@@ -29,21 +29,22 @@ class _CreatePlanPageState extends State<CreatePlanPage> {
           Expanded(
               child: CardWidget(
                 title: "Week 1",
-                backgroundColour: Colors.pinkAccent,
+                backgroundColour: Colors.purpleAccent,
                 weekNumber: 1,
               ),
           ),
           Expanded(
               child: CardWidget(
                 title: "Week 2",
-                backgroundColour: Colors.orangeAccent,
+                backgroundColour: Colors.purpleAccent,
                 weekNumber: 2,
               )
           ),
           Expanded(
               child: CardWidget(
                 title: "Week 3",
-                backgroundColour: Colors.lightGreenAccent,
+                backgroundColour: Colors.purpleAccent
+                ,
                 weekNumber: 3,
               )
           ),
