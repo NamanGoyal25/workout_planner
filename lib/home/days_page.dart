@@ -1,16 +1,17 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DaysPage extends StatefulWidget {
-  const DaysPage({Key? key}) : super(key: key);
+  final int? selectedWeek;
+
+  const DaysPage({Key? key,this.selectedWeek}) : super(key: key);
 
   @override
   State<DaysPage> createState() => _DaysPageState();
 }
 
 class _DaysPageState extends State<DaysPage> {
-  // Initialize index variable to keep track of S.No.
-  // int indexCounter = 0;
   List<int> indexCounterList = List.generate(7, (index) => 0);
 
   List<List<DayData>> exercisesByDay = [
@@ -34,10 +35,13 @@ class _DaysPageState extends State<DaysPage> {
   List<String> categories = [];
   List<String> exercises = [];
   late StateSetter localState;
+  late int selectedWeek;
+
 
   @override
   void initState() {
     super.initState();
+    selectedWeek = widget.selectedWeek ?? 1; // Set default week to 1 if not provided
     fetchCategories();
   }
 
@@ -70,14 +74,80 @@ class _DaysPageState extends State<DaysPage> {
           .get();
 
       localState(() {
-        exercises = querySnapshot.docs
-            .map((doc) => doc['exerciseName'] as String)
-            .toList();
+        exercises = querySnapshot.docs.map((doc) => doc['exerciseName'] as String).toList();
       });
 
       print("Exercises: $exercises");
     } catch (e) {
       print('Error fetching exercises: $e');
+    }
+  }
+
+  Future<void> addExerciseToFirestore(String day, String exerciseName, String repetitions, String sets, int selectedWeek) async {
+    try {
+      String userId = FirebaseAuth.instance.currentUser!.uid;
+      DateTime now = DateTime.now();
+      String monthYear = "${_getMonthName(now.month)}${now.year}";
+      String subCollectionName = 'Week$selectedWeek,$monthYear';
+
+      // Create a reference to the subcollection
+      CollectionReference userCollection = FirebaseFirestore.instance.collection('users').doc(userId).collection(subCollectionName);
+
+      // Split selectedCategory to extract the name
+      String categoryName = selectedCategory!.split(':')[1].trim();
+
+      // Add exercise data to the document in the subcollection
+      await userCollection.doc(day).set({
+        'day': day,
+        'exercises': FieldValue.arrayUnion([
+          {
+            'exerciseCategory': categoryName,
+            'exerciseName': exerciseName,
+            'repetitions': repetitions,
+            'sets': sets,
+          }
+        ])
+      }, SetOptions(merge: true)); // Merge with existing data if the document exists
+      print(day);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Exercise saved successfully')),
+      );
+    } catch (e) {
+      print('Error saving exercise: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to save exercise')),
+      );
+    }
+  }
+
+  String _getMonthName(int month) {
+    switch (month) {
+      case 1:
+        return 'Jan';
+      case 2:
+        return 'Feb';
+      case 3:
+        return 'Mar';
+      case 4:
+        return 'Apr';
+      case 5:
+        return 'May';
+      case 6:
+        return 'Jun';
+      case 7:
+        return 'Jul';
+      case 8:
+        return 'Aug';
+      case 9:
+        return 'Sep';
+      case 10:
+        return 'Oct';
+      case 11:
+        return 'Nov';
+      case 12:
+        return 'Dec';
+      default:
+        return '';
     }
   }
 
@@ -98,6 +168,7 @@ class _DaysPageState extends State<DaysPage> {
               children: [
                 Text(
                   daysData[index].name,
+                  semanticsLabel: 'Selected Week: $selectedWeek',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 10),
@@ -205,11 +276,20 @@ class _DaysPageState extends State<DaysPage> {
                                             exercisesByDay[index].add(newExercise);
                                             // Use indexCounterList for S.No.
                                             indexCounterList[index]++;
-                                        }
+
+                                            // Add exercise to Firestore
+                                            addExerciseToFirestore(
+                                              daysData[index].name,
+                                              selectedExercise!,
+                                              repetitions!,
+                                              sets!,
+                                              selectedWeek!,
+                                            );
+                                          }
                                         });
                                         Navigator.pop(context);
-                                  },
-                                  child: Text('Save'),
+                                      },
+                                      child: Text('Save'),
                                     ),
                                   ],
                                 ),
@@ -251,22 +331,22 @@ class _DaysPageState extends State<DaysPage> {
                                     for (int j = i; j < exercisesByDay[index]
                                         .length; j++);
                                   });
-                                  },
-                                ),
+                                },
                               ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                            ),
+                          ],
+                        ),
+                    ],
+                  ),
                 ),
-              );
-            },
-          ),
-        );
-      }
-    }
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
 
 class DayData {
   final String name;
