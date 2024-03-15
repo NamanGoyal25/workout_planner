@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 
 class RegisterPage extends StatefulWidget {
@@ -13,7 +14,7 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   bool showLoader = false;
 
-  // TextEditingController ageController = new TextEditingController();
+  TextEditingController ageController = new TextEditingController();
   TextEditingController phonenumberController = new TextEditingController();
   //TextEditingController genderController = new TextEditingController();
   TextEditingController confirmpasswordController = new TextEditingController();
@@ -44,35 +45,39 @@ class _RegisterPageState extends State<RegisterPage> {
     }
 
     try {
-        UserCredential userCredential = await FirebaseAuth.instance
-            .createUserWithEmailAndPassword(email: emailController.text.trim(),
-          password: passwordController.text.trim(),);
-        print("User Created Successfully:" + userCredential.user!.uid.toString
-          ());
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: emailController.text.trim(),
+        password: passwordController.text.trim(),);
+      print("User Created Successfully:" + userCredential.user!.uid.toString
+        ());
 
-        //Save the user details in the Cloud Firestore Database
-        FirebaseFirestore.instance.collection("users").doc(userCredential.user!
-            .uid).set(
-            {
-              "name": nameController.text.trim(),
-              "age": selectedAge,
-              "gender": selectedGender,
-              "phone number": phonenumberController.text.trim(),
-              "email": emailController.text.trim(),
-              "createdOn": DateTime.now(),
-            }
-        ).then((value) => Navigator.pushReplacementNamed(context, "/home"));
+      //Save the user details in the Cloud Firestore Database
+      FirebaseFirestore.instance.collection("users").doc(userCredential.user!
+          .uid).set(
+          {
+            "name": nameController.text.trim(),
+            "age": selectedAge,
+            "gender": selectedGender,
+            "phone number": phonenumberController.text.trim(),
+            "email": emailController.text.trim(),
+            "createdOn": DateTime.now(),
+          }
+      ).then((value) => Navigator.pushReplacementNamed(context, "/home"));
 
-        // if (userCredential.user!.uid.isNotEmpty){
-        //   Navigator.pushReplacementNamed(context, "/home");
-        // }
+      // if (userCredential.user!.uid.isNotEmpty){
+      //   Navigator.pushReplacementNamed(context, "/home");
+      // }
 
-      }
-      on FirebaseAuthException catch (e) {
+    }
+    on FirebaseAuthException catch (e) {
       print("Something Went Wrong:" + e.message.toString());
       print("Error Code:" + e.code.toString());
     }
   }
+
+  // State variable to track whether passwords match
+  bool passwordsMatch = false;
+  String? _confirmPassword;
 
   @override
   Widget build(BuildContext context) {
@@ -81,164 +86,286 @@ class _RegisterPageState extends State<RegisterPage> {
       body: showLoader? Center(child: CircularProgressIndicator(),):
       SingleChildScrollView(
         child: Container(
-          padding: EdgeInsets.all(16.0),
+          padding: EdgeInsets.all(10.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Image.asset("assets/logo4.png",width: 50,height: 50,),
-              const SizedBox(height: 6,),
-              const Text("Register", style: TextStyle(color: Colors.deepPurple, fontSize: 24),),
-              const SizedBox(height: 4,),
-              TextFormField(
-                keyboardType: TextInputType.text,
-                controller: nameController ,
-                style: const TextStyle(
-                  color: Colors.white,
+
+              SizedBox(height:30),
+
+              Text("Sign Up", style: GoogleFonts.montserrat(
+                fontWeight: FontWeight.bold,
+                fontSize: 35,
+                color: Colors.white,
+              ),
+              ),
+
+              SizedBox(height: 30),
+
+              Container(
+                padding: EdgeInsets.all(10.0),
+                width: MediaQuery.of(context).size.width * 0.9,
+                decoration: BoxDecoration(
+                    color: Colors.grey.shade900,
+                    borderRadius: BorderRadius.circular(10.0)
                 ),
-                decoration: const InputDecoration(
-                    labelText: "Enter Full Name",
-                    filled: false
+                child: TextFormField(
+                  keyboardType: TextInputType.text,
+                  controller: nameController,
+                  style: TextStyle(color: Colors.white),
+                  cursorColor: Colors.deepPurple, // Cursor color
+                  decoration: InputDecoration(
+                    hintText: "Full Name", // Hint text
+                    hintStyle: TextStyle(color: Colors.white.withOpacity(0.75)), // Opacity for hint text
+                    border: InputBorder.none, // Remove border
+                    enabledBorder: InputBorder.none, // Remove border when enabled
+                    focusedBorder: InputBorder.none, // Remove border when focused
+                  ),
                 ),
               ),
-              const SizedBox(height: 4,),
-              // Dropdown for selecting age
+
+              const SizedBox(height: 10),
+
               Container(
-              child:SingleChildScrollView(
-              child : InputDecorator(
-                decoration: const InputDecoration(
-                    filled: false,
-                    labelText: "Select Your Age"),
-                child: DropdownButtonFormField<int>(
-                  value: selectedAge,
-                  dropdownColor: Colors.black,
-                  items: ages.map((int age) {
-                    return DropdownMenuItem<int>(
-                      value: age,
-                      child: Text(age.toString(),
-                        style: TextStyle(color: Colors.white),),
-                    );
-                  }).toList(),
-                  onChanged: (int? value) {
+                padding: EdgeInsets.all(10.0),
+                width: MediaQuery.of(context).size.width * 0.9,
+                decoration: BoxDecoration(
+                    color: Colors.grey.shade900,
+                    borderRadius: BorderRadius.circular(10.0)
+                ),
+                child: TextFormField(
+                  keyboardType: TextInputType.number,
+                  controller: ageController,
+                  style: TextStyle(color: Colors.white),
+                  cursorColor: Colors.deepPurple, // Cursor color
+                  decoration: InputDecoration(
+                    hintText: "Age", // Hint text
+                    hintStyle: TextStyle(color: Colors.white.withOpacity(0.75)), // Opacity for hint text
+                    border: InputBorder.none, // Remove border
+                    enabledBorder: InputBorder.none, // Remove border when enabled
+                    focusedBorder: InputBorder.none, // Remove border when focused
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              Container(
+                padding: EdgeInsets.all(10.0),
+                width: MediaQuery.of(context).size.width * 0.9,
+                decoration: BoxDecoration(
+                    color: Colors.grey.shade900,
+                    borderRadius: BorderRadius.circular(10.0)
+                ),
+                child: TextFormField(
+                  keyboardType: TextInputType.number,
+                  controller: phonenumberController,
+                  style: TextStyle(color: Colors.white),
+                  cursorColor: Colors.deepPurple, // Cursor color
+                  decoration: InputDecoration(
+                    hintText: "Phone Number", // Hint text
+                    hintStyle: TextStyle(color: Colors.white.withOpacity(0.75)), // Opacity for hint text
+                    border: InputBorder.none, // Remove border
+                    enabledBorder: InputBorder.none, // Remove border when enabled
+                    focusedBorder: InputBorder.none, // Remove border when focused
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              Container(
+                padding: EdgeInsets.all(10.0),
+                width: MediaQuery.of(context).size.width * 0.9,
+                decoration: BoxDecoration(
+                    color: Colors.grey.shade900,
+                    borderRadius: BorderRadius.circular(10.0)
+                ),
+                child: TextFormField(
+                  keyboardType: TextInputType.emailAddress,
+                  controller: emailController,
+                  style: TextStyle(color: Colors.white),
+                  cursorColor: Colors.deepPurple, // Cursor color
+                  decoration: InputDecoration(
+                    hintText: "Email ID", // Hint text
+                    hintStyle: TextStyle(color: Colors.white.withOpacity(0.75)), // Opacity for hint text
+                    border: InputBorder.none, // Remove border
+                    enabledBorder: InputBorder.none, // Remove border when enabled
+                    focusedBorder: InputBorder.none, // Remove border when focused
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              Container(
+                padding: EdgeInsets.all(10.0),
+                width: MediaQuery.of(context).size.width * 0.9,
+                decoration: BoxDecoration(
+                    color: Colors.grey.shade900,
+                    borderRadius: BorderRadius.circular(10.0)
+                ),
+                child: TextFormField(
+                  keyboardType: TextInputType.text,
+                  controller: passwordController,
+                  style: TextStyle(color: Colors.white),
+                  cursorColor: Colors.deepPurple, // Cursor color
+                  decoration: InputDecoration(
+                    hintText: "Password", // Hint text
+                    hintStyle: TextStyle(color: Colors.white.withOpacity(0.75)), // Opacity for hint text
+                    border: InputBorder.none, // Remove border
+                    enabledBorder: InputBorder.none, // Remove border when enabled
+                    focusedBorder: InputBorder.none, // Remove border when focused
+                  ),
+                  obscureText: true,
+                  onChanged: (value) {
                     setState(() {
-                      selectedAge = value;
+                      passwordsMatch = value == confirmpasswordController.text;
                     });
                   },
                 ),
               ),
-              ),
-              ),
-              const SizedBox(height: 4,),
-              InputDecorator(
-                  decoration: const InputDecoration(
-                      filled: false,
-                      labelText: "Select Your Gender")
-              ),
-              // Gender selection
-              Row(
-                children: [
-                  Radio<String>(
-                    value: "Male",
-                    groupValue: selectedGender,
-                    onChanged: (String? value) {
-                      setState(() {
-                        selectedGender = value;
-                      });
-                    },
+
+              const SizedBox(height: 10),
+
+              Container(
+                padding: EdgeInsets.all(10.0),
+                width: MediaQuery.of(context).size.width * 0.9,
+                decoration: BoxDecoration(
+                    color: Colors.grey.shade900,
+                    borderRadius: BorderRadius.circular(10.0)
+                ),
+                child: TextFormField(
+                  keyboardType: TextInputType.text,
+                  controller: confirmpasswordController,
+                  onChanged: (value) {
+                    setState(() {
+                      if(value == ''){
+                        _confirmPassword=null;
+                      }else {
+                        _confirmPassword = value;
+                      }
+                    });
+                  },
+                  style: TextStyle(color: Colors.white),
+                  cursorColor: Colors.deepPurple, // Cursor color
+                  decoration: InputDecoration(
+                    hintText: "Confirm Password", // Hint text
+                    hintStyle: TextStyle(color: Colors.white.withOpacity(0.75)), // Opacity for hint text
+                    border: InputBorder.none, // Remove border
+                    enabledBorder: InputBorder.none, // Remove border when enabled
+                    focusedBorder: InputBorder.none, // Remove border when focused
+                    suffixIcon: _confirmPassword != null && _confirmPassword == passwordController.text
+                        ? Icon(Icons.check_circle, color: Colors.green)
+                        : _confirmPassword != null && _confirmPassword != passwordController.text
+                        ? Icon(Icons.cancel, color: Colors.red)
+                        : null, // Display green tick or red cross based on password match
                   ),
-                  const Text(
-                      "Male",
+                  obscureText: true,
+                ),
+              ),
+
+              Container(
+                padding: EdgeInsets.all(10.0),
+                width: MediaQuery.of(context).size.width * 0.9,
+                decoration: BoxDecoration(
+                    color: Colors.transparent
+                ),
+                child:Row(
+                  children: [
+                    Text('Gender : ',style: TextStyle(color: Colors.white),),
+                    Radio<String>( value: "Male",
+                      groupValue: selectedGender,
+                      onChanged: (String? value) {
+                        setState(() {
+                          selectedGender = value;
+                        });
+                      },
+                    ),
+                    const Text("Male",
                       style: TextStyle(color: Colors.white),
+                    ),
+                    Radio<String>(
+                      value: "Female",
+                      groupValue: selectedGender,
+                      onChanged: (String? value) {
+                        setState(() {
+                          selectedGender = value;
+                        });
+                      },
+                    ),
+                    const Text("Female",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+
+              Container(
+                padding: EdgeInsets.all(1.0),
+                width: MediaQuery.of(context).size.width * 0.9, // Adjust width with MediaQuery
+                // Set a fixed height or adjust with MediaQuery
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10.0),
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.purple,
+                      Colors.deepPurple,
+                      Colors.purple,
+                    ],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
                   ),
-                  Radio<String>(
-                    value: "Female",
-                    groupValue: selectedGender,
-                    onChanged: (String? value) {
-                      setState(() {
-                        selectedGender = value;
-                      });
+                ),
+
+                child: ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      showLoader = true;
+                    });
+                    registerUser();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent, // Set transparent color
+                    elevation: 0, // Remove shadow
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                  ),
+                  child: Text("Register",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("Existing User ? ",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                  InkWell(
+                    child: Text("Login Here",
+                      style: TextStyle(
+                        color: Colors.deepPurple,
+                        fontSize: 16,
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.pushNamed(context, "/login");
                     },
-                  ),
-                  const Text(
-                    "Female",
-                    style: TextStyle(color: Colors.white),
                   ),
                 ],
               ),
-              //TextFormField(
-              //   keyboardType: TextInputType.text,
-              //  // controller: genderController ,
-              //   style: const TextStyle(
-              //     color: Colors.white,
-              //   ),
-              //   decoration: const InputDecoration(
-              //     filled: false,
-              //   ),
-              // ),
-              const SizedBox(height: 4,),
-              TextFormField(
-                keyboardType: TextInputType.text,
-                controller: phonenumberController ,
-                style: const TextStyle(
-                  color: Colors.white,
-                ),
-                decoration: const InputDecoration(
-                    labelText: "Enter Phone Number",
-                  filled: false,
-                ),
-              ),
-              const SizedBox(height: 4,),
-              TextFormField(
-                keyboardType: TextInputType.emailAddress,
-                controller: emailController ,
-                style: const TextStyle(
-                  color: Colors.white,
-                ),
-                decoration: const InputDecoration(
-                  filled: false,
-                    labelText: "Enter Email ID",
-                ),
-              ),
-              const SizedBox(height: 4,),
-              TextFormField(
-                keyboardType: TextInputType.text,
-                 controller: passwordController,
-                 style: const TextStyle(
-                  color: Colors.white,
-                ),
-                decoration: const InputDecoration(
-                  filled: false,
-                    labelText: "Enter Password",
-                ),
-                obscureText: true,
-              ),
-              const SizedBox(height: 4,),
-              TextFormField(
-                keyboardType: TextInputType.text,
-                controller: confirmpasswordController,
-                style: const TextStyle(
-                  color: Colors.white,
-                ),
-                decoration: const InputDecoration(
-                  filled: false,
-                    labelText: "Confirm Password ",
-                ),
-                obscureText: true,
-              ),
-              const SizedBox(height: 4,),
-              OutlinedButton(onPressed: (){
-                setState(() {
-                  showLoader = true;
-                  registerUser();
-                });
-              }, child: const Text("REGISTER")),
-              const SizedBox(height: 12,),
-              InkWell(
-                child: const Text("Existing user? Login Here",  style: TextStyle(color: Colors.deepPurple, fontSize: 14,),),
-                onTap: (){
-                  Navigator.pushNamed(context, "/login");
-                },
-              )
             ],
           ),
         ),
