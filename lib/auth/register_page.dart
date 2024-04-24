@@ -62,7 +62,7 @@ class _RegisterPageState extends State<RegisterPage> {
             "email": emailController.text.trim(),
             "createdOn": DateTime.now(),
           }
-      ).then((value) => Navigator.pushReplacementNamed(context, "/home"));
+      ).then((value) => Navigator.pushReplacementNamed(context, "/login"));
 
       // if (userCredential.user!.uid.isNotEmpty){
       //   Navigator.pushReplacementNamed(context, "/home");

@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:workout_planner/home/create_plan.dart';
 import 'package:workout_planner/home/execute_plan.dart';
-import 'package:workout_planner/home/history.dart';
+import 'package:workout_planner/home/history_page.dart';
 import 'package:workout_planner/home/home_page.dart';
 import 'package:workout_planner/home/profile.dart';
 
@@ -24,7 +24,7 @@ class _NavPageState extends State<NavPage> {
     currentUser = FirebaseAuth.instance.currentUser;
     screens = [
       HomePage(),
-      History(),
+      HistoryPage(),
       CreatePlanPage(),
       ExecutePlanPage(),
       Profile(),
