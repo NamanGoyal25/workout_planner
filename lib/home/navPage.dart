@@ -5,9 +5,10 @@ import 'package:workout_planner/home/execute_plan.dart';
 import 'package:workout_planner/home/history_page.dart';
 import 'package:workout_planner/home/home_page.dart';
 import 'package:workout_planner/home/profile.dart';
+import 'package:google_nav_bar/google_nav_bar.dart';
 
 class NavPage extends StatefulWidget {
-  const NavPage({super.key});
+  const NavPage({Key? key}) : super(key: key);
 
   @override
   State<NavPage> createState() => _NavPageState();
@@ -34,97 +35,50 @@ class _NavPageState extends State<NavPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: screens[index],
-        bottomNavigationBar: Container(
-          decoration: const BoxDecoration(
-            boxShadow: [
-              BoxShadow(
-                color: Color(0xff303030),
-                offset: Offset(2.0, 1.0),
-                blurRadius: 3.0,
-                spreadRadius: 3.0,
-              ), //BoxShadow
-            ],
+      body: screens[index],
+      bottomNavigationBar: GNav(
+        rippleColor: Colors.black,
+        hoverColor: Colors.black,
+        haptic: true,
+        tabBorderRadius: 15,
+        tabActiveBorder: Border.all(color: Colors.transparent, width: 1),
+        tabBorder: Border.all(color: Colors.transparent, width: 1),
+        tabShadow: [
+          BoxShadow(color: Colors.transparent.withOpacity(0.1), blurRadius: 8)
+        ],
+        curve: Curves.fastOutSlowIn,
+        duration:Duration(milliseconds: 200),
+        gap: 8,
+        color: Colors.grey[800],
+        activeColor: Colors.deepPurple[300],
+        iconSize: 24,
+        tabBackgroundColor: Colors.deepPurple.withOpacity(0.2),
+        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+        tabs: const [
+          GButton(
+            icon: Icons.home,
+            text: 'Home',
           ),
-          child: NavigationBarTheme(
-            data: NavigationBarThemeData(
-              indicatorColor: Colors.deepPurple.shade400,
-              surfaceTintColor: Color(0xff202020),
-              labelTextStyle: MaterialStateProperty.all(
-                TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.grey),
-              ),
-            ),
-            child: NavigationBar(
-              height: 60,
-              backgroundColor: Colors.black,
-              selectedIndex: index,
-              onDestinationSelected: (index) =>
-                  setState(() => this.index = index),
-              destinations: [
-
-                NavigationDestination(
-                    icon: Icon(
-                      Icons.home_outlined,
-                      color: Colors.grey,
-                    ),
-                    selectedIcon: Icon(
-                      Icons.home,
-                      color: Colors.white,
-                    ),
-                    label: 'Home'),
-
-                NavigationDestination(
-                    icon: Icon(
-                      Icons.history_outlined,
-                      color: Colors.grey,
-                    ),
-                    selectedIcon: Icon(
-                      Icons.history,
-                      color: Colors.white,
-                    ),
-                    label: "History"),
-
-                NavigationDestination(
-                    icon: Icon(
-                      Icons.add_outlined,
-                      color: Colors.grey,
-                    ),
-                    selectedIcon: Icon(
-                      Icons.add,
-                      color: Colors.white,
-                    ),
-                    label: 'Create Plan'),
-
-                NavigationDestination(
-                  icon: Icon(
-                    Icons.play_arrow_outlined,
-                    color: Colors.grey,
-                  ),
-                  selectedIcon: Icon(
-                    Icons.play_arrow,
-                    color: Colors.white,
-                  ),
-                  label: 'Execute Plan',
-                ),
-
-                NavigationDestination(
-                    icon: Icon(
-                      Icons.person_2_outlined,
-                      color: Colors.grey,
-                    ),
-                    selectedIcon: Icon(
-                      Icons.person_2,
-                      color: Colors.white,
-                    ),
-                    label: "Profile"),
-
-              ],
-            ),
+          GButton(
+            icon: Icons.history,
+            text: 'History',
           ),
-        )
+          GButton(
+            icon: Icons.add,
+            text: 'Create',
+          ),
+          GButton(
+            icon: Icons.play_arrow_outlined,
+            text: 'Execute',
+          )
+        ],
+        selectedIndex: index,
+        onTabChange: (int newIndex) {
+          setState(() {
+            index = newIndex;
+          });
+        },
+      ),
     );
   }
 }

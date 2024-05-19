@@ -39,8 +39,8 @@ class MyApp extends StatelessWidget {
         ),
       ),
       debugShowCheckedModeBanner: false,
-      home: const MyHomePage(),
-       initialRoute: '/nav',
+      // home: const MyHomePage(),
+       initialRoute: '/splash',
       routes: {
 
         '/splash': (context) => const SplashPage(),
@@ -48,7 +48,7 @@ class MyApp extends StatelessWidget {
         '/register': (context) => const RegisterPage(),
         '/home': (context) => HomePage(),
         '/create': (context) => CreatePlanPage(),
-        '/execute': (context) => ExecutePlanPage(),
+        '/execute': (context) => const ExecutePlanPage(),
         '/analysis': (context) => AnalysisPage(),
         '/days': (context) => const DaysPage(),
         '/nav': (context) => const NavPage(),
@@ -60,41 +60,41 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  // User? firebaseUser;
-  // Widget initialScreen = const SplashScreen();
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    Future.delayed(const Duration(seconds: 2), checkAuthState);
-  }
-
-  checkAuthState() async {
-    debugPrint("checkAuthState");
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      //not login
-      Navigator.pushReplacementNamed(context, '/nav');
-    } else {
-      //logged in
-      // await().getUserFromFirestore(user: user, bContent: context);
-      debugPrint("after getting user data");
-      Navigator.pushReplacementNamed(context, '/nav');
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return NavPage();
-  }
-}
+//
+//
+// class MyHomePage extends StatefulWidget {
+//   const MyHomePage({super.key});
+//   @override
+//   State<MyHomePage> createState() => _MyHomePageState();
+// }
+//
+// class _MyHomePageState extends State<MyHomePage> {
+//   // User? firebaseUser;
+//   // Widget initialScreen = const SplashScreen();
+//
+//   @override
+//   void initState() {
+//     // TODO: implement initState
+//     super.initState();
+//     Future.delayed(const Duration(seconds: 2), checkAuthState);
+//   }
+//
+//   checkAuthState() async {
+//     debugPrint("checkAuthState");
+//     User? user = FirebaseAuth.instance.currentUser;
+//     if (user == null) {
+//       //not login
+//       Navigator.pushReplacementNamed(context, '/nav');
+//     } else {
+//       //logged in
+//       // await().getUserFromFirestore(user: user, bContent: context);
+//       debugPrint("after getting user data");
+//       Navigator.pushReplacementNamed(context, '/nav');
+//     }
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return NavPage();
+//   }
+// }

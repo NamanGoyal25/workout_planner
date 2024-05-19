@@ -16,9 +16,11 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController passwordController = TextEditingController();
 
   void loginUser() async {
-    if (emailController.text.trim().isEmpty || passwordController.text.isEmpty) {
+    if (emailController.text.trim().isEmpty ||
+        passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Please enter valid email and password.', style: TextStyle(color: Colors.white),textAlign: TextAlign.center),
+        content: Text('Please enter valid email and password.',
+            style: TextStyle(color: Colors.white), textAlign: TextAlign.center),
         backgroundColor: Colors.red.shade600,
         duration: Duration(seconds: 2),
       ));
@@ -32,10 +34,10 @@ class _LoginPageState extends State<LoginPage> {
     try {
       UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(
-          email: emailController.text.trim(),
-          password: passwordController.text.trim());
-      print("User Signed In Successfully:" +
-          userCredential.user!.uid.toString());
+              email: emailController.text.trim(),
+              password: passwordController.text.trim());
+      print(
+          "User Signed In Successfully:" + userCredential.user!.uid.toString());
 
       if (userCredential.user!.uid.isNotEmpty) {
         Navigator.pushReplacementNamed(context, "/nav");
@@ -45,9 +47,9 @@ class _LoginPageState extends State<LoginPage> {
       print("Error code: " + e.code.toString());
 
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Invalid credentials. Please try again.', style: TextStyle(color: Colors.white),textAlign: TextAlign.center),
+        content: Text('Invalid credentials. Please try again.',
+            style: TextStyle(color: Colors.white), textAlign: TextAlign.center),
         backgroundColor: Colors.red.shade600,
-
       ));
     } finally {
       setState(() {
@@ -56,8 +58,7 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-
-  bool _isPasswordVisible= true;
+  bool _isPasswordVisible = true;
 
   @override
   Widget build(BuildContext context) {
@@ -79,76 +80,84 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   SizedBox(height: 5),
-                  Text('to your own fitness companion',
+                  Text(
+                    'to your own fitness companion',
                     style: GoogleFonts.montserrat(
                         fontSize: 15,
                         color: Colors.grey.shade600,
-                        fontStyle: FontStyle.italic
-                    ),
+                        fontStyle: FontStyle.italic),
                   ),
                   SizedBox(height: 30),
-
                   Container(
                     padding: EdgeInsets.all(10.0),
                     width: MediaQuery.of(context).size.width * 0.9,
                     decoration: BoxDecoration(
                         color: Colors.grey.shade900,
-                        borderRadius: BorderRadius.circular(10.0)
-                    ),
+                        borderRadius: BorderRadius.circular(10.0)),
                     child: TextFormField(
                       keyboardType: TextInputType.emailAddress,
                       controller: emailController,
                       style: TextStyle(color: Colors.white),
-                      cursorColor: Colors.deepPurple, // Cursor color
+                      cursorColor: Colors.deepPurple,
+                      // Cursor color
                       decoration: InputDecoration(
-                        hintText: "Enter Email ID", // Hint text
-                        hintStyle: TextStyle(color: Colors.white.withOpacity(0.75)), // Opacity for hint text
-                        border: InputBorder.none, // Remove border
-                        enabledBorder: InputBorder.none, // Remove border when enabled
-                        focusedBorder: InputBorder.none, // Remove border when focused
+                        hintText: "Enter Email ID",
+                        // Hint text
+                        hintStyle:
+                            TextStyle(color: Colors.white.withOpacity(0.75)),
+                        // Opacity for hint text
+                        border: InputBorder.none,
+                        // Remove border
+                        enabledBorder: InputBorder.none,
+                        // Remove border when enabled
+                        focusedBorder:
+                            InputBorder.none, // Remove border when focused
                       ),
                     ),
                   ),
-
-
                   SizedBox(height: 20),
-
                   Container(
                     padding: EdgeInsets.all(10.0),
                     width: MediaQuery.of(context).size.width * 0.9,
                     decoration: BoxDecoration(
                         color: Colors.grey.shade900,
-                        borderRadius: BorderRadius.circular(10.0)
-                    ),
-                    child:TextFormField(
+                        borderRadius: BorderRadius.circular(10.0)),
+                    child: TextFormField(
                       keyboardType: TextInputType.text,
                       controller: passwordController,
                       style: TextStyle(color: Colors.white),
-                      cursorColor: Colors.deepPurple, // Cursor color
+                      cursorColor: Colors.deepPurple,
+                      // Cursor color
                       decoration: InputDecoration(
-                        hintText: "Enter Password", // Hint text
-                        hintStyle: TextStyle(color: Colors.white.withOpacity(0.75)),
+                        hintText: "Enter Password",
+                        // Hint text
+                        hintStyle:
+                            TextStyle(color: Colors.white.withOpacity(0.75)),
                         suffixIcon: IconButton(
-                            onPressed: (){
+                            onPressed: () {
                               setState(() {
                                 _isPasswordVisible = !_isPasswordVisible;
                               });
                             },
-                            icon:Icon(_isPasswordVisible? Icons.visibility_off_outlined: Icons.visibility_outlined)
-                        ), // Opacity for hint text
-                        border: InputBorder.none, // Remove border
-                        enabledBorder: InputBorder.none, // Remove border when enabled
-                        focusedBorder: InputBorder.none, // Remove border when focused
+                            icon: Icon(_isPasswordVisible
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined)),
+                        // Opacity for hint text
+                        border: InputBorder.none,
+                        // Remove border
+                        enabledBorder: InputBorder.none,
+                        // Remove border when enabled
+                        focusedBorder:
+                            InputBorder.none, // Remove border when focused
                       ),
                       obscureText: _isPasswordVisible,
                     ),
                   ),
-
                   SizedBox(height: 20),
-
                   Container(
                     padding: EdgeInsets.all(1.0),
-                    width: MediaQuery.of(context).size.width * 0.9, // Adjust width with MediaQuery
+                    width: MediaQuery.of(context).size.width *
+                        0.9, // Adjust width with MediaQuery
                     // Set a fixed height or adjust with MediaQuery
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10.0),
@@ -168,37 +177,41 @@ class _LoginPageState extends State<LoginPage> {
                         loginUser();
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.transparent, // Set transparent color
-                        elevation: 0, // Remove shadow
+                        backgroundColor: Colors.transparent,
+                        // Set transparent color
+                        elevation: 0,
+                        // Remove shadow
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10.0),
                         ),
                       ),
-                      child: showLoader ?
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.08, // Adjust width fraction as needed
-                        height: MediaQuery.of(context).size.width * 0.08, // Adjust height fraction as needed
-                        child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                          strokeWidth: 2, // Adjust strokeWidth as needed
-                        ),
-                      )
-                          : Text("Login",
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.white,
-                        ),
-                      ),
+                      child: showLoader
+                          ? SizedBox(
+                              width: MediaQuery.of(context).size.width *
+                                  0.08, // Adjust width fraction as needed
+                              height: MediaQuery.of(context).size.width *
+                                  0.08, // Adjust height fraction as needed
+                              child: CircularProgressIndicator(
+                                valueColor:
+                                    AlwaysStoppedAnimation<Color>(Colors.white),
+                                strokeWidth: 2, // Adjust strokeWidth as needed
+                              ),
+                            )
+                          : Text(
+                              "Login",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.white,
+                              ),
+                            ),
                     ),
                   ),
-
-
                   SizedBox(height: 20),
-
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text("New User ? ",
+                      Text(
+                        "New User ? ",
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 16,

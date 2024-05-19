@@ -14,12 +14,9 @@ class DaysPage extends StatefulWidget {
 
 class _DaysPageState extends State<DaysPage> {
   final _weekNameController = TextEditingController();
-
   List<int> indexCounterList = List.generate(7, (index) => 0);
   String _weekName = '';
-
   List<List<DayData>> exercisesByDay = [[], [], [], [], [], [], []];
-
   List<DayData> daysData = [
     DayData(name: 'Monday'),
     DayData(name: 'Tuesday'),
@@ -29,13 +26,11 @@ class _DaysPageState extends State<DaysPage> {
     DayData(name: 'Saturday'),
     DayData(name: 'Sunday'),
   ];
-
   String? selectedCategory;
   String? selectedExercise;
   String? repetitions;
   String? sets;
   String? weight;
-
   List<String> categories = [];
   List<String> exercises = [];
   late StateSetter localState;
@@ -67,11 +62,11 @@ class _DaysPageState extends State<DaysPage> {
           await FirebaseFirestore.instance.collection('categories').get();
       List<String> fetchedCategories = [];
       querySnapshot.docs.forEach((doc) {
-        String name = doc['name'] as String;
+        String categoryName = doc['name'] as String;
         String categoryId = doc.id;
-        fetchedCategories.add('$categoryId: $name');
+        fetchedCategories.add('$categoryId: $categoryName');
       });
-      print(fetchedCategories);
+      print('Fetched Categories:$fetchedCategories');
       setState(() {
         categories = fetchedCategories;
       });
@@ -87,13 +82,11 @@ class _DaysPageState extends State<DaysPage> {
           .doc(selectedCategory)
           .collection('exercises')
           .get();
-
       localState(() {
         exercises = querySnapshot.docs
             .map((doc) => doc['exerciseName'] as String)
             .toList();
       });
-
       print("Exercises: $exercises");
     } catch (e) {
       print('Error fetching exercises: $e');
@@ -106,17 +99,13 @@ class _DaysPageState extends State<DaysPage> {
       DateTime now = DateTime.now();
       String monthYear = "${_getMonthName(now.month)}${now.year}";
       String subCollectionName = 'Week$selectedWeek,$monthYear';
-
       CollectionReference userCollection = FirebaseFirestore.instance
           .collection('users')
           .doc(userId)
           .collection(subCollectionName);
-
       DocumentSnapshot dayDocument = await userCollection.doc(day).get();
-
       if (dayDocument.exists) {
         List<dynamic> exercisesData = dayDocument['exercises'];
-
         // Check if any exercise in the day document has the same name
         return exercisesData
             .any((exercise) => exercise['exerciseName'] == exerciseName);
@@ -124,9 +113,25 @@ class _DaysPageState extends State<DaysPage> {
     } catch (e) {
       print('Error checking exercise existence: $e');
     }
-
     // Return false if there was an error or the exercise does not exist
     return false;
+  }
+
+  Future<String> fetchCategoryName(String? categoryId) async {
+    try {
+      DocumentSnapshot categorySnapshot = await FirebaseFirestore.instance
+          .collection('categories')
+          .doc(categoryId)
+          .get();
+      if (categorySnapshot.exists) {
+        return categorySnapshot.get('name');
+      } else {
+        return ''; // Return empty string if category not found
+      }
+    } catch (e) {
+      print('Error fetching category name: $e');
+      return ''; // Return empty string if error occurs
+    }
   }
 
   Future<void> addExerciseToFirestore(
@@ -140,13 +145,13 @@ class _DaysPageState extends State<DaysPage> {
     int index,
   ) async {
     try {
+      // Fetch category name based on selectedCategory ID
+      String categoryName = await fetchCategoryName(selectedCategory);
       // Check if the exercise already exists in the database
       bool exerciseExists = await checkExerciseExists(day, exerciseName);
-
       if (exerciseExists) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Exercise already exists')),
-
         );
         return;
       } else {
@@ -155,20 +160,18 @@ class _DaysPageState extends State<DaysPage> {
         String monthYear = "${_getMonthName(now.month)}${now.year}";
         String subCollectionName = 'Week$selectedWeek,$monthYear';
         print("check");
-
         int? parsedRepetitions =
             repetitions != null ? int.tryParse(repetitions) : null;
         int? parsedSets = sets != null ? int.tryParse(sets) : null;
         int? parsedWeight = weight != null ? int.tryParse(weight) : null;
-
         CollectionReference userCollection = FirebaseFirestore.instance
             .collection('users')
             .doc(userId)
             .collection(subCollectionName);
-
         DocumentReference dayDocumentRef =
             userCollection.doc(day); // Define dayDocumentRef here
         print("selectedCategory:$selectedCategory");
+        print("Naman");
         if (selectedCategory == 'yRBuIewVxfNASgu9gjPU') {
           QuerySnapshot categorySnapshot = await FirebaseFirestore.instance
               .collection('categories')
@@ -180,6 +183,7 @@ class _DaysPageState extends State<DaysPage> {
             'repetitions': parsedRepetitions,
             'sets': parsedSets,
             'weight': parsedWeight,
+            'categoryName': "Others"
           };
 
           await userCollection.doc(day).set({
@@ -222,6 +226,7 @@ class _DaysPageState extends State<DaysPage> {
             'repetitions': parsedRepetitions,
             'sets': parsedSets,
             'weight': parsedWeight,
+            'categoryName': categoryName
           };
 
           // Add the exercise map to the 'exercises' array in the day document
@@ -259,9 +264,7 @@ class _DaysPageState extends State<DaysPage> {
           // }
           exercisesByDay[index].add(newExercise);
           indexCounterList[index]++;
-        }
-        );
-
+        });
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Exercise saved successfully')),
         );
@@ -281,16 +284,12 @@ class _DaysPageState extends State<DaysPage> {
       DateTime now = DateTime.now();
       String monthYear = "${_getMonthName(now.month)}${now.year}";
       String subCollectionName = 'Week$selectedWeek,$monthYear';
-
       CollectionReference userCollection = FirebaseFirestore.instance
           .collection('users')
           .doc(userId)
           .collection(subCollectionName);
-
       DocumentReference dayDocumentRef = userCollection.doc(day);
-
       DocumentSnapshot dayDocument = await dayDocumentRef.get();
-
       if (dayDocument.exists) {
         // Remove the exercise from the exercises array in the day document
         List<dynamic> exercisesData = List.from(dayDocument['exercises']);
@@ -299,7 +298,6 @@ class _DaysPageState extends State<DaysPage> {
         await dayDocumentRef.update({
           'exercises': exercisesData,
         });
-
         // Remove the exercise from the executed subcollection
         QuerySnapshot executedSnapshot =
             await dayDocumentRef.collection('executed').get();
@@ -311,7 +309,6 @@ class _DaysPageState extends State<DaysPage> {
             'exercises': executedExercisesData,
           });
         });
-
         print('Exercise deleted successfully');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -342,17 +339,13 @@ class _DaysPageState extends State<DaysPage> {
       DateTime now = DateTime.now();
       String monthYear = "${_getMonthName(now.month)}${now.year}";
       String subCollectionName = 'Week$selectedWeek,$monthYear';
-
       CollectionReference userCollection = FirebaseFirestore.instance
           .collection('users')
           .doc(userId)
           .collection(subCollectionName);
-
       DocumentSnapshot dayDocument = await userCollection.doc(day).get();
-
       if (dayDocument.exists) {
         List<dynamic> exercisesData = dayDocument['exercises'];
-
         List<DayData> exercisesList = exercisesData.map((exercise) {
           return DayData(
             name: day,
@@ -363,7 +356,6 @@ class _DaysPageState extends State<DaysPage> {
             // weight: exercise['weight'] != null ? exercise['weight'].toString() : null,
           );
         }).toList();
-
         setState(() {
           exercisesByDay[daysData
               .indexWhere((element) => element.name == day)] = exercisesList;
@@ -469,11 +461,12 @@ class _DaysPageState extends State<DaysPage> {
                                     StateSetter localState) {
                                   this.localState = localState;
                                   return SingleChildScrollView(
-                                    padding: EdgeInsets.only(bottom: 
-                                    MediaQuery.of(context).viewInsets.bottom),
+                                    padding: EdgeInsets.only(
+                                        bottom: MediaQuery.of(context)
+                                            .viewInsets
+                                            .bottom),
                                     child: Container(
                                       padding: const EdgeInsets.all(16),
-                                      
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.stretch,
@@ -559,7 +552,6 @@ class _DaysPageState extends State<DaysPage> {
                                                 ),
                                               ],
                                             ),
-
                                           const SizedBox(height: 20),
                                           TextField(
                                             decoration: const InputDecoration(
@@ -633,28 +625,6 @@ class _DaysPageState extends State<DaysPage> {
                                                       _weekName,
                                                       index,
                                                     );
-
-                                                    DayData newExercise =
-                                                        DayData(
-                                                      name:
-                                                          daysData[index].name,
-                                                      exerciseName:
-                                                          selectedExercise,
-                                                      repetitions: repetitions,
-                                                      sets: sets,
-                                                      weight: weight != null
-                                                          ? int.tryParse(
-                                                              weight!)
-                                                          : null,
-                                                    );
-                                                    // if (exercisesByDay[index]
-                                                    //     .isEmpty) {
-                                                    //   exercisesByDay[index] =
-                                                    //       [];
-                                                    // }
-                                                    // exercisesByDay[index]
-                                                    //     .add(newExercise);
-                                                    // indexCounterList[index]++;
                                                   }
                                                 });
                                                 Navigator.pop(context);
@@ -669,7 +639,11 @@ class _DaysPageState extends State<DaysPage> {
                                                           10.0),
                                                 ),
                                               ),
-                                              child: const Text('Save'),
+                                              child: const Text(
+                                                'Save',
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                              ),
                                             ),
                                           ),
                                         ],
