@@ -158,6 +158,7 @@ class _ExercisePieChartState extends State<ExercisePieChart> {
                   pieTouchData: PieTouchData(
                     touchCallback: (pieTouchResponse) {
                       setState(() {
+                        // ignore: unnecessary_null_comparison
                         if (pieTouchResponse == null ||
                             pieTouchResponse.touchedSection == null) {
                           touchedIndex = -1;
